@@ -1,10 +1,27 @@
-import React from 'react';
-import { Box, Stack, Button, IconButton, VStack, HStack, Text } from '@chakra-ui/react';
-import { FaMapMarkerAlt } from 'react-icons/fa';
-import { CloseIcon } from '@chakra-ui/icons';
-import Logo from '../Logo/Logo';
+import React from "react";
+import {
+  Box,
+  Stack,
+  Button,
+  IconButton,
+  VStack,
+  HStack,
+  Text,
+} from "@chakra-ui/react";
+import { FaMapMarkerAlt } from "react-icons/fa";
+import { CloseIcon } from "@chakra-ui/icons";
+import { useNavigate } from "react-router-dom";
+import Logo from "../Logo/Logo";
 
 const Sidebar = ({ onClose }) => {
+  const navigate = useNavigate();
+
+
+  const handleClick = () => {
+    navigate("/login");
+  };
+
+
   return (
     <Box
       bg="teal.500"
@@ -35,14 +52,16 @@ const Sidebar = ({ onClose }) => {
         <VStack spacing={4} alignItems="flex-start" w="full">
           <HStack spacing={3} alignItems="center">
             <FaMapMarkerAlt />
-            <Text fontWeight="bold" fontSize="lg">Location</Text>
+            <Text fontWeight="bold" fontSize="lg">
+              Location
+            </Text>
           </HStack>
           <Button
             variant="solid"
             colorScheme="teal"
             borderRadius="md"
             w="full"
-            _hover={{ transform: 'scale(0.95)', bg: 'teal.600' }} // Zoom out effect on hover
+            _hover={{ transform: "scale(0.95)", bg: "teal.600" }} // Zoom out effect on hover
             transition="transform 0.2s"
           >
             Sell Property
@@ -52,7 +71,7 @@ const Sidebar = ({ onClose }) => {
             colorScheme="teal"
             borderRadius="md"
             w="full"
-            _hover={{ transform: 'scale(0.95)', bg: 'teal.600' }} // Zoom out effect on hover
+            _hover={{ transform: "scale(0.95)", bg: "teal.600" }} // Zoom out effect on hover
             transition="transform 0.2s"
           >
             Rent Property
@@ -62,8 +81,9 @@ const Sidebar = ({ onClose }) => {
             colorScheme="teal"
             borderRadius="md"
             w="full"
-            _hover={{ transform: 'scale(0.95)', bg: 'teal.600' }} // Zoom out effect on hover
+            _hover={{ transform: "scale(0.95)", bg: "teal.600" }} // Zoom out effect on hover
             transition="transform 0.2s"
+            onClick={handleClick}
           >
             Login / Sign Up
           </Button>
@@ -72,7 +92,7 @@ const Sidebar = ({ onClose }) => {
             colorScheme="teal"
             borderRadius="md"
             w="full"
-            _hover={{ transform: 'scale(0.95)', bg: 'teal.600' }} // Zoom out effect on hover
+            _hover={{ transform: "scale(0.95)", bg: "teal.600" }} 
             transition="transform 0.2s"
           >
             Contact Us

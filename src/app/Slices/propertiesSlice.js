@@ -7,10 +7,15 @@ const propertySlice = createSlice({
     data: [],
     isLoading: false,
     error: null,
+    totalPages: 1,
+    currentPage: 1,
+    propertyById: null, // Added to store property by ID
   },
   reducers: {
     setpropertyData: (state, action) => {
-      state.data = action.payload; 
+      state.data = action.payload;
+      state.totalPages = action.payload.totalPages;
+      state.currentPage = action.payload.currentPage;
       state.isLoading = false;
       state.error = null;
     },
@@ -22,12 +27,27 @@ const propertySlice = createSlice({
       state.isLoading = false;
       state.error = action.payload;
     },
+    setPropertyById: (state, action) => {
+      state.propertyById = action.payload;
+      state.isLoading = false;
+      state.error = null;
+    },
+    setPropertyByIdError: (state, action) => {
+      state.isLoading = false;
+      state.error = action.payload;
+    },
   },
 });
 
-export const { setpropertyData, setpropertyLoading, setpropertyError } = propertySlice.actions;
+export const { 
+  setpropertyData, 
+  setpropertyLoading, 
+  setpropertyError, 
+  setPropertyById,
+  setPropertyByIdError 
+} = propertySlice.actions;
 
-export const fetchAllpropertyData = (searchQuery = '', location = '', sublocation = '', propertyFor = '', propertyType = '') => async (dispatch) => {
+export const fetchAllpropertyData = (searchQuery = '', location = '', subLocation = '', propertyFor = '', propertyType = '', propertySubtype= '',) => async (dispatch) => {
   dispatch(setpropertyLoading());
   let allProperties = [];
   let page = 1;
@@ -43,9 +63,10 @@ export const fetchAllpropertyData = (searchQuery = '', location = '', sublocatio
             limit: 20,
             propertyNo: searchQuery,
             location,
-            sublocation,
+            subLocation,
             propertyFor,
             propertyType,
+            propertySubtype,
           },
         }
       );
@@ -74,14 +95,29 @@ export const AddpropertyData = (formData) => async (dispatch) => {
       }
     );
 
-    dispatch(fetchAllpropertyData()); 
+    dispatch(fetchAllpropertyData());
   } catch (error) {
     console.error("Error:", error);
+  }
+};
+
+export const fetchPropertyById = (id) => async (dispatch) => {
+  dispatch(setpropertyLoading());
+  try {
+    const response = await axios.get(
+      `${import.meta.env.VITE_BASE_URL}property/getProperty/${id}`
+    );
+    dispatch(setPropertyById(response.data.data));
+  } catch (error) {
+    dispatch(setPropertyByIdError(error.message));
   }
 };
 
 export const selectpropertyData = (state) => state.property.data;
 export const selectpropertyLoading = (state) => state.property.isLoading;
 export const selectpropertyError = (state) => state.property.error;
+export const selectTotalPages = (state) => state.property.totalPages;
+export const selectCurrentPage = (state) => state.property.currentPage;
+export const selectPropertyById = (state) => state.property.propertyById;
 
 export default propertySlice.reducer;

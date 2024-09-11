@@ -8,6 +8,7 @@ import SignUp from "../components/Authentication/SignUp";
 import { AnimatePresence } from "framer-motion";
 import Not_Found from "../components/Not_Found/Not_Found";
 import Detail from "../components/Details/Detail";
+import Property from "../components/Property/Property";
 
 const Routing = () => {
   return (
@@ -22,6 +23,7 @@ const Routing = () => {
           <Route index element={<Dashboard />} />
           <Route path="contact" element={<Contact />} />
           <Route path="property" element={<Detail />} />
+          <Route path="property/:id" element={<Property />} />
         </Route>
         <Route path="*" element={<Not_Found />} />
       </Routes>

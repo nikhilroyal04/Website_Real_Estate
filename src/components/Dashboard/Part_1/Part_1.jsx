@@ -27,6 +27,7 @@ import {
 import { MdArrowOutward } from "react-icons/md";
 import Loader from "../../Not_Found/Loader";
 import Error502 from "../../Not_Found/Error502";
+import { useNavigate } from "react-router-dom";
 
 const Part_1 = () => {
   const isSmallScreen = useBreakpointValue({ base: true, md: false });
@@ -34,6 +35,7 @@ const Part_1 = () => {
   const [propertyType, setPropertyType] = useState("");
   const [selectedTab, setSelectedTab] = useState("Buy");
   const dispatch = useDispatch();
+  const navigate = useNavigate();
 
   const propertyData = useSelector(selectpropertyData);
   const propertyError = useSelector(selectpropertyError);
@@ -204,6 +206,7 @@ const Part_1 = () => {
                     width="90%"
                     display="flex"
                     alignItems="center"
+                    onClick={() => navigate(`/property`)}
                     _hover={{
                       transform: "scale(1.02)",
                       transition: "transform 0.3s ease",

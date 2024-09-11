@@ -33,7 +33,7 @@ export const fetchcontactData = () => async (dispatch) => {
     const response = await axios.get(
       import.meta.env.VITE_BASE_URL + "contact/getAllContacts"
     );
-    console.log("Fetched Data", response.data.data);
+    // console.log("Fetched Data", response.data.data);
     dispatch(setcontactData(response.data.data));
   } catch (error) {
     dispatch(setcontactError(error.message));

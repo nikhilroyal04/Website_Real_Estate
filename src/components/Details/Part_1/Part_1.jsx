@@ -1,13 +1,17 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Box,
   Container,
+  Heading,
   Text,
   Image,
   Stack,
   Button,
   useBreakpointValue,
+  Icon,
+  HStack,
 } from "@chakra-ui/react";
+import { MdLocationOn, MdHome, MdAspectRatio } from "react-icons/md";
 import Slider from "react-slick";
 import { useSelector, useDispatch } from "react-redux";
 import {
@@ -15,9 +19,13 @@ import {
   selectpropertyData,
   selectpropertyError,
   selectpropertyLoading,
+  selectTotalPages,
+  selectCurrentPage,
 } from "../../../app/Slices/propertiesSlice";
+import { useNavigate } from "react-router-dom";
 import Loader from "../../Not_Found/Loader";
 import Error502 from "../../Not_Found/Error502";
+import NoData from "../../Not_Found/NoData";
 
 const NextArrow = (props) => {
   const { className, style, onClick } = props;
@@ -26,7 +34,7 @@ const NextArrow = (props) => {
       className={className}
       style={{
         ...style,
-        background: "rgba(0, 0, 0, 0.1)", // Semi-transparent background
+        background: "rgba(0, 0, 0, 0.1)",
         width: "40px",
         height: "98%",
         zIndex: 2,
@@ -39,9 +47,7 @@ const NextArrow = (props) => {
         alignItems: "center",
       }}
       onClick={onClick}
-    >
-      {/* <span style={{ color: '#fff', fontSize: '20px' }}>&#x276F;</span> Right arrow character */}
-    </Button>
+    ></Button>
   );
 };
 
@@ -52,7 +58,7 @@ const PrevArrow = (props) => {
       className={className}
       style={{
         ...style,
-        background: "rgba(0, 0, 0, 0.1)", // Semi-transparent background
+        background: "rgba(0, 0, 0, 0.1)",
         width: "40px",
         height: "98%",
         zIndex: 2,
@@ -65,23 +71,24 @@ const PrevArrow = (props) => {
         alignItems: "center",
       }}
       onClick={onClick}
-    >
-      {/* <span style={{ color: '#fff', fontSize: '20px' }}>&#x276E;</span> Left arrow character */}
-    </Button>
+    ></Button>
   );
 };
 
 const Part_1 = () => {
+  const [currentPage, setCurrentPage] = useState(1);
   const isSmallScreen = useBreakpointValue({ base: true, md: false });
 
   const propertyData = useSelector(selectpropertyData);
   const propertyError = useSelector(selectpropertyError);
   const propertyLoading = useSelector(selectpropertyLoading);
+  const totalPages = useSelector(selectTotalPages);
   const dispatch = useDispatch();
+  const navigate = useNavigate();
 
   useEffect(() => {
-    dispatch(fetchAllpropertyData());
-  }, [dispatch]);
+    dispatch(fetchAllpropertyData(currentPage));
+  }, [dispatch, currentPage]);
 
   if (propertyError) {
     return <Error502 />;
@@ -91,7 +98,96 @@ const Part_1 = () => {
     return <Loader />;
   }
 
-  // Carousel settings
+  if (propertyData.length == 0) {
+    return <NoData />;
+  }
+
+  const handleFirstPage = () => setCurrentPage(1);
+  const handleLastPage = () => setCurrentPage(totalPages);
+  const handleNextPage = () => {
+    if (currentPage < totalPages) setCurrentPage(currentPage + 1);
+  };
+  const handlePrevPage = () => {
+    if (currentPage > 1) setCurrentPage(currentPage - 1);
+  };
+
+  const renderPaginationButtons = () => {
+    const pages = [];
+
+    if (currentPage > 2) {
+      pages.push(
+        <Button key="first" onClick={handleFirstPage}>
+          First
+        </Button>
+      );
+    }
+
+    if (currentPage > 1) {
+      pages.push(
+        <Button key="prev" onClick={handlePrevPage}>
+          Previous
+        </Button>
+      );
+    }
+
+    const pageRange = 3;
+    let startPage = Math.max(1, currentPage - pageRange);
+    let endPage = Math.min(totalPages, currentPage + pageRange);
+
+    if (startPage > 1) {
+      pages.push(
+        <Button key="1" onClick={() => setCurrentPage(1)}>
+          1
+        </Button>
+      );
+      if (startPage > 2) {
+        pages.push(<Text key="dots1">...</Text>);
+      }
+    }
+
+    for (let i = startPage; i <= endPage; i++) {
+      pages.push(
+        <Button
+          key={i}
+          onClick={() => setCurrentPage(i)}
+          colorScheme={i === currentPage ? "teal" : undefined}
+          disabled={i === currentPage}
+        >
+          {i}
+        </Button>
+      );
+    }
+
+    if (endPage < totalPages) {
+      if (endPage < totalPages - 1) {
+        pages.push(<Text key="dots2">...</Text>);
+      }
+      pages.push(
+        <Button key={totalPages} onClick={() => setCurrentPage(totalPages)}>
+          {totalPages}
+        </Button>
+      );
+    }
+
+    if (currentPage < totalPages) {
+      pages.push(
+        <Button key="next" onClick={handleNextPage}>
+          Next
+        </Button>
+      );
+    }
+
+    if (totalPages > 2) {
+      pages.push(
+        <Button key="last" onClick={handleLastPage}>
+          Last
+        </Button>
+      );
+    }
+
+    return pages;
+  };
+
   const settings = {
     dots: false,
     infinite: true,
@@ -106,37 +202,33 @@ const Part_1 = () => {
   };
 
   return (
-    <Container maxW="container.xl" py={8}>
-      {propertyData.map((property) => {
-        // Convert JSON string to array
-        const usps = JSON.parse(property.usp || "[]");
-        const facilities = JSON.parse(property.facility || "[]");
-
-        return (
+    <Container maxW="100vw" py={5}>
+      {propertyData.map((property) => (
+        <Box
+          key={property._id}
+          borderRadius="lg"
+          overflow="hidden"
+          mb={6}
+          bg="white"
+          boxShadow="lg"
+          maxW="80vw"
+          mx="auto"
+          p={6}
+          display="flex"
+          flexDirection={isSmallScreen ? "column" : "row"}
+          alignItems="stretch"
+          position="relative"
+          justifyContent="space-between"
+        >
           <Box
-            key={property.id}
-            borderWidth="1px"
-            borderRadius="lg"
-            overflow="hidden"
-            mb={6}
-            bg="white"
-            boxShadow="md"
-            p={4}
-            display="flex"
-            flexDirection={isSmallScreen ? "column" : "row"}
-            alignItems="stretch"
+            flex="1"
+            maxW={isSmallScreen ? "100%" : "50%"}
+            mb={isSmallScreen ? 4 : 0}
             position="relative"
           >
-            {/* Images Section */}
-            <Box
-              flex="1"
-              maxW={isSmallScreen ? "100%" : "50%"}
-              height={isSmallScreen ? "auto" : "auto"}
-              mb={isSmallScreen ? 4 : 0}
-              position="relative"
-            >
-              <Slider {...settings}>
-                {property.media.map((image, index) => (
+            <Slider {...settings}>
+              {property.media.length > 0 ? (
+                property.media.map((image, index) => (
                   <Box
                     key={index}
                     height="auto"
@@ -146,73 +238,73 @@ const Part_1 = () => {
                   >
                     <Image
                       src={image}
-                      alt={`Property ${property.id} image ${index + 1}`}
+                      alt={`Property ${property._id} image ${index + 1}`}
                       width="100%"
                       height="auto"
                       objectFit="cover"
                       objectPosition="center"
                     />
                   </Box>
-                ))}
-              </Slider>
-            </Box>
-
-            {/* Details Section */}
-            <Box
-              flex="1"
-              px={4}
-              display="flex"
-              flexDirection="column"
-              justifyContent="center"
-              height={isSmallScreen ? "auto" : "auto"}
-            >
-              <Stack spacing={3}>
-                <Text fontSize="xl" fontWeight="bold">
-                  {property.projectName}
-                </Text>
-                <Text fontSize="md" color="gray.600">
-                  {property.property}
-                </Text>
-                <Text fontSize="md" color="gray.600">
-                  {property.location}
-                </Text>
-                <Text fontSize="md" color="gray.600">
-                  {property.address}
-                </Text>
-                <Text fontSize="lg" color="teal.600" fontWeight="bold">
-                  {property.price}{" "}
-                  {/* Assuming price is part of property data */}
-                </Text>
-                {/* USPs Section */}
-                {usps.length > 0 && (
-                  <Stack spacing={2} mt={4}>
-                    <Text fontSize="xl" fontWeight="bold">
-                      Features
-                    </Text>
-                    {usps.map((usp, index) => (
-                      <Text key={index} fontSize="md" color="gray.800">
-                        - {usp}
-                      </Text>
-                    ))}
-                  </Stack>
-                )}
-                {facilities.length > 0 && (
-                  <Stack spacing={2} mt={4}>
-                    <Text fontSize="xl" fontWeight="bold">
-                      Facility
-                    </Text>
-                    {facilities.map((facility, index) => (
-                      <Text key={index} fontSize="md" color="gray.800">
-                        - {facility}
-                      </Text>
-                    ))}
-                  </Stack>
-                )}
-              </Stack>
-            </Box>
+                ))
+              ) : (
+                <Text>No images available</Text>
+              )}
+            </Slider>
           </Box>
-        );
-      })}
+
+          <Box
+            flex="1"
+            px={10}
+            py={4}
+            display="flex"
+            flexDirection="column"
+            justifyContent="center"
+            maxW={isSmallScreen ? "100%" : "50%"}
+            borderRadius="md"
+          >
+            <Stack spacing={4}>
+              <Heading fontSize="2xl" fontWeight="bold" color="teal.500">
+                {property.projectName}
+              </Heading>
+              <Text fontSize="lg" fontWeight="medium">
+                <Icon as={MdHome} color="teal.600" mr={2} fontSize={25} />
+                {property.property}
+              </Text>
+              <Text fontSize="lg" color="gray.700">
+                <Icon as={MdLocationOn} color="teal.600" mr={2} fontSize={25} />
+                {property.address}
+              </Text>
+              <Text fontSize="lg" color="gray.700">
+                <Icon
+                  as={MdAspectRatio}
+                  color="teal.600"
+                  mr={2}
+                  fontSize={25}
+                />
+                Size: {property.size}
+              </Text>
+              <Text fontSize="lg" fontWeight="bold" color="teal.600">
+                Property Type: {property.propertyType}
+              </Text>
+            </Stack>
+            <Button
+              mt={5}
+              bg="blue.400"
+              maxW="200px"
+              color="white"
+              cursor="pointer"
+              _hover={{ transform: "scale(1.05)" }}
+              onClick={() => navigate(`/property/${property._id}`)} // Updated navigation
+            >
+              View More Details
+            </Button>
+          </Box>
+        </Box>
+      ))}
+
+      <HStack spacing={4} justifyContent="center" mt={6}>
+        {renderPaginationButtons()}
+      </HStack>
     </Container>
   );
 };

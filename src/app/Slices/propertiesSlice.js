@@ -9,6 +9,7 @@ const propertySlice = createSlice({
     error: null,
     currentPage: 1,  
     totalPages: 1,  
+    propertyById: null, 
   },
   reducers: {
     setpropertyData: (state, action) => {
@@ -38,7 +39,7 @@ const propertySlice = createSlice({
   },
 });
 
-export const { setpropertyData, setpropertyLoading, setpropertyError } = propertySlice.actions;
+export const { setpropertyData, setpropertyLoading, setpropertyError, setPropertyById, setPropertyByIdError } = propertySlice.actions;
 
 export const fetchAllpropertyData = (page = 1, searchQuery = '', location = '', subLocation = '', propertyFor = '', propertyType = '', propertySubtype='') => async (dispatch) => {
   dispatch(setpropertyLoading());

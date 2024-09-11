@@ -4,6 +4,8 @@ import { useParams } from "react-router-dom";
 import {
   fetchPropertyById,
   selectPropertyById,
+  selectpropertyError,
+  selectpropertyLoading,
 } from "../../../app/Slices/propertiesSlice";
 import Loader from "../../Not_Found/Loader";
 import Error502 from "../../Not_Found/Error502";
@@ -80,8 +82,8 @@ const PropertyDetails = () => {
   const { id } = useParams();
   const dispatch = useDispatch();
   const property = useSelector(selectPropertyById);
-  const isLoading = useSelector((state) => state.property.isLoading);
-  const error = useSelector((state) => state.property.error);
+  const isLoading = useSelector(selectpropertyLoading);
+  const error = useSelector(selectpropertyError);
 
   useEffect(() => {
     if (id) {

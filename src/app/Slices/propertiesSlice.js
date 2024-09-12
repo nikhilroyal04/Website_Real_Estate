@@ -7,10 +7,15 @@ const propertySlice = createSlice({
     data: [],
     isLoading: false,
     error: null,
+    currentPage: 1,  
+    totalPages: 1,  
+    propertyById: null, 
   },
   reducers: {
     setpropertyData: (state, action) => {
-      state.data = action.payload; 
+      state.data = action.payload.properties;  
+      state.totalPages = action.payload.totalPages;
+      state.currentPage = action.payload.currentPage;
       state.isLoading = false;
       state.error = null;
     },
@@ -22,41 +27,47 @@ const propertySlice = createSlice({
       state.isLoading = false;
       state.error = action.payload;
     },
+    setPropertyById: (state, action) => {
+      state.propertyById = action.payload;
+      state.isLoading = false;
+      state.error = null;
+    },
+    setPropertyByIdError: (state, action) => {
+      state.isLoading = false;
+      state.error = action.payload;
+    },
   },
 });
 
-export const { setpropertyData, setpropertyLoading, setpropertyError } = propertySlice.actions;
+export const { setpropertyData, setpropertyLoading, setpropertyError, setPropertyById, setPropertyByIdError } = propertySlice.actions;
 
-export const fetchAllpropertyData = (searchQuery = '', location = '', sublocation = '', propertyFor = '', propertyType = '') => async (dispatch) => {
+export const fetchAllpropertyData = (page = 1, searchQuery = '', location = '', subLocation = '', propertyFor = '', propertyType = '', propertySubtype='') => async (dispatch) => {
   dispatch(setpropertyLoading());
-  let allProperties = [];
-  let page = 1;
-  let totalPages = 1;
 
   try {
-    while (page <= totalPages) {
-      const response = await axios.get(
-        `${import.meta.env.VITE_BASE_URL}property/getAllProperties`,
-        {
-          params: {
-            page,
-            limit: 20,
-            propertyNo: searchQuery,
-            location,
-            sublocation,
-            propertyFor,
-            propertyType,
-          },
-        }
-      );
+    const response = await axios.get(
+      `${import.meta.env.VITE_BASE_URL}property/getAllProperties`,
+      {
+        params: {
+          page,
+          limit: 20,
+          propertyNo: searchQuery,
+          location,
+          subLocation,
+          propertyFor,
+          propertyType,
+          propertySubtype,
+        },
+      }
+    );
 
-      const { properties, totalPages: fetchedTotalPages } = response.data.data; 
-      allProperties = [...allProperties, ...properties];
-      totalPages = fetchedTotalPages;
-      page++;
-    }
+    const { properties, totalPages } = response.data.data; 
 
-    dispatch(setpropertyData(allProperties)); 
+    dispatch(setpropertyData({
+      properties,   
+      totalPages,   
+      currentPage: page,  
+    }));
   } catch (error) {
     dispatch(setpropertyError(error.message));
   }
@@ -80,8 +91,24 @@ export const AddpropertyData = (formData) => async (dispatch) => {
   }
 };
 
+export const fetchPropertyById = (id) => async (dispatch) => {
+  dispatch(setpropertyLoading());
+  try {
+    const response = await axios.get(
+      `${import.meta.env.VITE_BASE_URL}property/getProperty/${id}`
+    );
+    dispatch(setPropertyById(response.data.data));
+  } catch (error) {
+    dispatch(setPropertyByIdError(error.message));
+  }
+};
+
 export const selectpropertyData = (state) => state.property.data;
 export const selectpropertyLoading = (state) => state.property.isLoading;
 export const selectpropertyError = (state) => state.property.error;
+export const selectTotalPages = (state) => state.property.totalPages;  
+export const selectCurrentPage = (state) => state.property.currentPage;  
+export const selectPropertyById = (state) => state.property.propertyById;
+
 
 export default propertySlice.reducer;

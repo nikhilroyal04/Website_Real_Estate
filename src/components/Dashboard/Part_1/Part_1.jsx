@@ -27,41 +27,42 @@ import {
 import { MdArrowOutward } from "react-icons/md";
 import Loader from "../../Not_Found/Loader";
 import Error502 from "../../Not_Found/Error502";
+import { useNavigate } from "react-router-dom";
 
 const Part_1 = () => {
   const isSmallScreen = useBreakpointValue({ base: true, md: false });
   const [searchTerm, setSearchTerm] = useState("");
   const [propertyType, setPropertyType] = useState("");
   const [selectedTab, setSelectedTab] = useState("Buy");
+  const [filteredProperties, setFilteredProperties] = useState([]);
   const dispatch = useDispatch();
+  const navigate = useNavigate();
 
   const propertyData = useSelector(selectpropertyData);
   const propertyError = useSelector(selectpropertyError);
   const propertyLoading = useSelector(selectpropertyLoading);
 
   useEffect(() => {
-    dispatch(fetchAllpropertyData());
-  }, [dispatch]);
+    if (searchTerm.trim()) { 
+      dispatch(
+        fetchAllpropertyData(
+          1, 
+          "",
+          searchTerm,
+          propertyType,
+          selectedTab
+        )
+      );
+    } else {
+      setFilteredProperties([]);
+    }
+  }, [dispatch, searchTerm, propertyType, selectedTab]);
 
-  // Filter properties based on the search term, property type, and selected tab
-  const filteredProperties = searchTerm
-    ? propertyData.filter((property) => {
-        const matchesSearchTerm =
-          property.location.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          property.subLocation.toLowerCase().includes(searchTerm.toLowerCase());
-        const matchesPropertyType = propertyType
-          ? property.propertyType === propertyType
-          : true;
-        const matchesTab = selectedTab
-          ? property.propertyFor === selectedTab
-          : true;
-
-        return matchesSearchTerm && matchesPropertyType && matchesTab;
-      })
-    : [];
-
-  // Limit to top 4 properties
-  const topProperties = filteredProperties.slice(0, 4);
+  useEffect(() => {
+    if (searchTerm.trim()) {
+      setFilteredProperties(propertyData);
+    }
+  }, [propertyData, searchTerm]);
 
   const handleSearch = (event) => {
     setSearchTerm(event.target.value);
@@ -76,12 +77,18 @@ const Part_1 = () => {
     setSelectedTab(tabNames[index]);
   };
 
-  // Determine if error message should be shown
   const showError = searchTerm && propertyError;
+
+  const topProperties = filteredProperties.slice(0, 4);
+
+  // Construct URL with query parameters
+  const createQueryString = (filters) => {
+    const params = new URLSearchParams(filters);
+    return params.toString();
+  };
 
   return (
     <Box position="relative" w="100%" h="89vh">
-      {/* Background Image */}
       <Box
         as="img"
         src={Part_1_Image}
@@ -94,8 +101,6 @@ const Part_1 = () => {
         left={0}
         zIndex={-1}
       />
-
-      {/* Content Overlay */}
       <Container
         maxW="container.xl"
         h="100%"
@@ -105,7 +110,6 @@ const Part_1 = () => {
         alignItems="center"
         p={4}
       >
-        {/* Search Container */}
         <Box
           bg="rgba(255, 255, 255, 0.8)"
           borderRadius="lg"
@@ -118,7 +122,6 @@ const Part_1 = () => {
           _hover={{ transform: "scale(1.02)" }}
           transition="transform 0.3s ease"
         >
-          {/* Tabs (Visible only on larger screens) */}
           {!isSmallScreen && (
             <HStack spacing={4} mb={4} width="100%">
               <Tabs
@@ -134,8 +137,6 @@ const Part_1 = () => {
               </Tabs>
             </HStack>
           )}
-
-          {/* Search Bar */}
           <Flex width="100%" alignItems="center" direction="row">
             <Select
               placeholder="Type"
@@ -171,7 +172,6 @@ const Part_1 = () => {
               Search
             </Button>
           </Flex>
-          {/* Error Message */}
           {showError && (
             <Text mt={4} color="red.500" fontWeight="bold">
               Unable to fetch data. Please try again later.
@@ -179,7 +179,6 @@ const Part_1 = () => {
           )}
         </Box>
 
-        {/* Displaying filtered properties only if searchTerm is not empty */}
         <Box
           borderRadius="lg"
           boxShadow="md"
@@ -190,64 +189,68 @@ const Part_1 = () => {
           alignItems="center"
           width={900}
         >
-          {searchTerm ? (
+          {filteredProperties.length > 0 ? (
             <VStack spacing={4} mt={6} align="center" w="100%" maxH="55vh">
-              {topProperties.length > 0 ? (
-                topProperties.map((property) => (
-                  <Box
-                    key={property.propertyId}
-                    borderWidth="1px"
-                    borderRadius="xl"
-                    p={3}
-                    bg="rgba(255, 255, 255, 0.5)"
-                    shadow="md"
-                    width="90%"
-                    display="flex"
-                    alignItems="center"
-                    _hover={{
-                      transform: "scale(1.02)",
-                      transition: "transform 0.3s ease",
-                      cursor: "pointer",
-                    }}
-                  >
-                    <FaMapLocationDot
-                      fontSize="24px"
-                      style={{ marginRight: 20 }}
-                    />
-
-                    <Flex
-                      width="90%"
-                      justifyContent="space-between"
-                      alignItems="center"
-                    >
-                      <Box>
-                        <Text fontWeight="bold">
-                          {property.propertySubtype} in {property.location}
-                        </Text>
-                        <Text>{property.subLocation}</Text>
-                      </Box>
-                      <Box>
-                        <MdArrowOutward fontSize={25} />
-                      </Box>
-                    </Flex>
-                  </Box>
-                ))
-              ) : (
-                <Flex
-                  direction="column"
-                  justify="center"
+              {topProperties.map((property) => (
+                <Box
+                  key={property._id}
+                  borderWidth="1px"
+                  borderRadius="xl"
+                  p={3}
+                  bg="rgba(255, 255, 255, 0.5)"
+                  shadow="md"
+                  width="90%"
+                  display="flex"
                   alignItems="center"
-                  height="100%"
-                  width="100%"
+                  onClick={() => {
+                    const filters = {
+                      location: searchTerm,
+                      propertyFor: selectedTab,
+                      propertyType,
+                    };
+                    const queryString = createQueryString(filters);
+                    navigate(`/property?${queryString}`);
+                  }}
+                  _hover={{
+                    transform: "scale(1.02)",
+                    transition: "transform 0.3s ease",
+                    cursor: "pointer",
+                  }}
                 >
-                  <Text fontSize="lg" fontWeight="bold" color="gray.700">
-                    No properties found
-                  </Text>
-                </Flex>
-              )}
+                  <FaMapLocationDot
+                    fontSize="24px"
+                    style={{ marginRight: 20 }}
+                  />
+                  <Flex
+                    width="90%"
+                    justifyContent="space-between"
+                    alignItems="center"
+                  >
+                    <Box>
+                      <Text fontWeight="bold">
+                        {property.propertySubtype} in {property.location}
+                      </Text>
+                      <Text>{property.subLocation}</Text>
+                    </Box>
+                    <Box>
+                      <MdArrowOutward fontSize={25} />
+                    </Box>
+                  </Flex>
+                </Box>
+              ))}
             </VStack>
           ) : (
-            <Text></Text>
+            <Flex
+              direction="column"
+              justify="center"
+              alignItems="center"
+              height="100%"
+              width="100%"
+            >
+              <Text fontSize="lg" fontWeight="bold" color="gray.700">
+                No properties found
+              </Text>
+            </Flex>
           )}
         </Box>
       </Container>

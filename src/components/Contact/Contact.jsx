@@ -17,11 +17,7 @@ import {
 } from "@chakra-ui/react";
 import { motion } from "framer-motion";
 import { useDispatch, useSelector } from "react-redux";
-import {
-  fetchcontactData,
-  AddcontactData,
-  selectcontactData,
-} from "../../app/Slices/contactSlice";
+import { AddcontactData } from "../../app/Slices/contactSlice";
 
 const MotionBox = motion(Box);
 
@@ -37,7 +33,6 @@ const Contact = () => {
   const [phoneError, setPhoneError] = useState("");
   const [emailError, setEmailError] = useState("");
   const dispatch = useDispatch();
-  const contactData = useSelector(selectcontactData);
 
   const { isOpen, onOpen, onClose } = useDisclosure();
 
@@ -46,30 +41,26 @@ const Contact = () => {
     return /^\d{10}$/.test(number);
   };
 
-  useEffect(() => {
-    dispatch(fetchcontactData());
-  }, [dispatch]);
-
   const handleSubmit = async (e) => {
     e.preventDefault();
-  
+
     let valid = true;
-  
+
     // Reset errors
     setPhoneError("");
     setEmailError("");
-  
+
     if (!validatePhoneNumber(phone)) {
       setPhoneError("Phone number must contain exactly 10 digits.");
       valid = false;
     }
-  
-    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/; 
+
+    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailPattern.test(email)) {
       setEmailError("Please enter a valid email address.");
       valid = false;
     }
-  
+
     if (valid) {
       try {
         const formData = new FormData();
@@ -78,12 +69,12 @@ const Contact = () => {
         formData.append("email", email);
         formData.append("preferredAvailableTime", preferredTime);
         formData.append("message", message);
-  
+
         // Simulate form submission
-        await dispatch(AddcontactData(formData)); 
-  
+        await dispatch(AddcontactData(formData));
+
         onOpen();
-  
+
         // Automatically close the slide message after 2 seconds
         setTimeout(() => {
           onClose();
@@ -100,7 +91,6 @@ const Contact = () => {
       }
     }
   };
-  
 
   // Generate time options every 2 hours from 10 AM to 9 PM
   const timeOptions = [];

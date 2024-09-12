@@ -33,7 +33,7 @@ const Part_1 = () => {
   const isSmallScreen = useBreakpointValue({ base: true, md: false });
   const [searchTerm, setSearchTerm] = useState("");
   const [propertyType, setPropertyType] = useState("");
-  const [selectedTab, setSelectedTab] = useState("Buy");
+  const [selectedTab, setSelectedTab] = useState("");
   const [filteredProperties, setFilteredProperties] = useState([]);
   const dispatch = useDispatch();
   const navigate = useNavigate();

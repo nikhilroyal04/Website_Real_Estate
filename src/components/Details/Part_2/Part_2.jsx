@@ -17,6 +17,7 @@ import Select from "react-select";
 import { useDispatch } from "react-redux";
 import { fetchAllpropertyData } from "../../../app/Slices/propertiesSlice";
 import { RxCross2 } from "react-icons/rx";
+import { useSearchParams } from "react-router-dom"; 
 import { CiFilter } from "react-icons/ci";
 
 export default function Part_2() {
@@ -52,16 +53,27 @@ export default function Part_2() {
 
   const dispatch = useDispatch();
   const { isOpen, onOpen, onClose } = useDisclosure();
+  const [searchParams, setSearchParams] = useSearchParams();
 
-  const [location, setLocation] = useState("");
-  const [subLocation, setsubLocation] = useState("");
-  const [propertyFor, setPropertyFor] = useState("");
-  const [propertyType, setPropertyType] = useState("");
-  const [propertySubtype, setPropertySubtype] = useState("");
-  
+  // Filter state
+  const [location, setLocation] = useState(searchParams.get("location") || "");
+  const [subLocation, setSubLocation] = useState(searchParams.get("subLocation") || "");
+  const [propertyFor, setPropertyFor] = useState(searchParams.get("propertyFor") || "");
+  const [propertyType, setPropertyType] = useState(searchParams.get("propertyType") || "");
+  const [propertySubtype, setPropertySubtype] = useState(searchParams.get("propertySubtype") || "");
 
-  // Update property data based on filters
+  // Fetch data when any filter changes
   useEffect(() => {
+    const currentFilters = {
+      location,
+      subLocation,
+      propertyFor,
+      propertyType,
+      propertySubtype,
+    };
+    // Update URL parameters
+    setSearchParams(currentFilters);
+
     dispatch(
       fetchAllpropertyData(
         1,
@@ -73,14 +85,7 @@ export default function Part_2() {
         propertySubtype
       )
     );
-  }, [
-    dispatch,
-    location,
-    subLocation,
-    propertyFor,
-    propertyType,
-    propertySubtype,
-  ]);
+  }, [dispatch, location, subLocation, propertyFor, propertyType, propertySubtype, setSearchParams]);
 
   const handleFilterChange = (filterName, value) => {
     switch (filterName) {
@@ -88,7 +93,7 @@ export default function Part_2() {
         setLocation(value);
         break;
       case "subLocation":
-        setsubLocation(value);
+        setSubLocation(value);
         break;
       case "propertyFor":
         setPropertyFor(value);
@@ -106,10 +111,11 @@ export default function Part_2() {
 
   const handleResetFilters = () => {
     setLocation("");
-    setsubLocation("");
+    setSubLocation("");
     setPropertyFor("");
     setPropertyType("");
     setPropertySubtype("");
+    setSearchParams({});
   };
 
   const handleApplyFilters = () => {

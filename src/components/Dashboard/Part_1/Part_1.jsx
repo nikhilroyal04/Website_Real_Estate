@@ -25,15 +25,13 @@ import {
   selectpropertyLoading,
 } from "../../../app/Slices/propertiesSlice";
 import { MdArrowOutward } from "react-icons/md";
-import Loader from "../../Not_Found/Loader";
-import Error502 from "../../Not_Found/Error502";
 import { useNavigate } from "react-router-dom";
 
 const Part_1 = () => {
   const isSmallScreen = useBreakpointValue({ base: true, md: false });
   const [searchTerm, setSearchTerm] = useState("");
   const [propertyType, setPropertyType] = useState("");
-  const [selectedTab, setSelectedTab] = useState("");
+  const [selectedTab, setSelectedTab] = useState("Buy");
   const [filteredProperties, setFilteredProperties] = useState([]);
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -43,10 +41,10 @@ const Part_1 = () => {
   const propertyLoading = useSelector(selectpropertyLoading);
 
   useEffect(() => {
-    if (searchTerm.trim()) { 
+    if (searchTerm.trim()) {
       dispatch(
         fetchAllpropertyData(
-          1, 
+          1,
           "",
           searchTerm,
           propertyType,
@@ -87,6 +85,16 @@ const Part_1 = () => {
     return params.toString();
   };
 
+  const handlePropertyClick = (property) => {
+    const filters = {
+      location: searchTerm,
+      propertyFor: selectedTab,
+      propertyType,
+    };
+    const queryString = createQueryString(filters);
+    navigate(`/property/?${queryString}`);
+  };
+
   return (
     <Box position="relative" w="100%" h="89vh">
       <Box
@@ -122,19 +130,15 @@ const Part_1 = () => {
           _hover={{ transform: "scale(1.02)" }}
           transition="transform 0.3s ease"
         >
-            <HStack spacing={4} mb={4} width="100%">
-              <Tabs
-                variant="enclosed"
-                colorScheme="teal"
-                onChange={handleTabChange}
-              >
-                <TabList>
-                  <Tab fontWeight="bold">Buy</Tab>
-                  <Tab fontWeight="bold">Rent</Tab>
-                  <Tab fontWeight="bold">PG/Co-Living</Tab>
-                </TabList>
-              </Tabs>
-            </HStack>
+          <HStack spacing={4} mb={4} width="100%">
+            <Tabs variant="enclosed" colorScheme="teal" onChange={handleTabChange}>
+              <TabList>
+                <Tab fontWeight="bold">Buy</Tab>
+                <Tab fontWeight="bold">Rent</Tab>
+                <Tab fontWeight="bold">PG/Co-Living</Tab>
+              </TabList>
+            </Tabs>
+          </HStack>
           <Flex width="100%" alignItems="center" direction="row">
             <Select
               placeholder="Type"
@@ -200,15 +204,7 @@ const Part_1 = () => {
                   width="90%"
                   display="flex"
                   alignItems="center"
-                  onClick={() => {
-                    const filters = {
-                      location: searchTerm,
-                      propertyFor: selectedTab,
-                      propertyType,
-                    };
-                    const queryString = createQueryString(filters);
-                    navigate(`/property?${queryString}`);
-                  }}
+                  onClick={() => handlePropertyClick(property)}
                   _hover={{
                     transform: "scale(1.02)",
                     transition: "transform 0.3s ease",

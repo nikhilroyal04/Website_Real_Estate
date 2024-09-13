@@ -18,6 +18,7 @@ const Error502 = () => {
       alignItems="center"
       flexDirection="column"
       height="auto"
+      marginBottom= "50px"
     >
       {/* Lottie Animation */}
       <Lottie

@@ -202,11 +202,21 @@ const PropertyDetails = () => {
             </Box>
           </SimpleGrid>
 
+           {/* Unique Selling Points */}
+           <Box>
+            <Heading fontSize="2xl" fontWeight="bold" color="teal.500" mb={4}>
+              Why choose this ?
+            </Heading>
+            <List spacing={2}>
+              {parseJSON(property.usp).map((usp, idx) => (
+                <ListItem key={idx}>- {usp}</ListItem>
+              ))}
+            </List>
+          </Box>
+
           {/* Facility and Connectivity */}
           <Box>
-            <Heading fontSize="2xl" fontWeight="bold" color="teal.500" mb={4}>
-              Key Features
-            </Heading>
+           
             <SimpleGrid columns={[1, 2, 2]} spacing={5}>
               <Box>
                 <Heading fontSize="lg" color="teal.500" mb={2}>
@@ -231,17 +241,6 @@ const PropertyDetails = () => {
             </SimpleGrid>
           </Box>
 
-          {/* Unique Selling Points */}
-          <Box>
-            <Heading fontSize="2xl" fontWeight="bold" color="teal.500" mb={4}>
-              Unique Selling Points
-            </Heading>
-            <List spacing={2}>
-              {parseJSON(property.usp).map((usp, idx) => (
-                <ListItem key={idx}>- {usp}</ListItem>
-              ))}
-            </List>
-          </Box>
         </Stack>
       </Box>
     </Container>

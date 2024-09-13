@@ -12,6 +12,7 @@ const NoData = () => {
         height: "auto",
         width: "auto",
         backgroundColor: "#fff", 
+        marginBottom: "50px",
       }}
     >
       <Lottie

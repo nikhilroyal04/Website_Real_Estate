@@ -18,6 +18,7 @@ const NotFound = () => {
       alignItems="center"
       flexDirection="column"
       height="90vh"
+      marginBottom= "50px"
     >
       {/* Lottie Animation */}
       <Lottie

@@ -122,7 +122,6 @@ const Part_1 = () => {
           _hover={{ transform: "scale(1.02)" }}
           transition="transform 0.3s ease"
         >
-          {!isSmallScreen && (
             <HStack spacing={4} mb={4} width="100%">
               <Tabs
                 variant="enclosed"
@@ -136,7 +135,6 @@ const Part_1 = () => {
                 </TabList>
               </Tabs>
             </HStack>
-          )}
           <Flex width="100%" alignItems="center" direction="row">
             <Select
               placeholder="Type"

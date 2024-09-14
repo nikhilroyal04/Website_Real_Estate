@@ -2,7 +2,7 @@ import React from "react";
 import { Box, Button, VStack } from "@chakra-ui/react";
 import { useNavigate } from "react-router-dom";
 import Lottie from "react-lottie-player";
-import animationData from "../../assets/502-network.json"; // Update the path if necessary
+import animationData from "../../assets/502-network.json"; 
 
 const Error502 = () => {
   const navigate = useNavigate();

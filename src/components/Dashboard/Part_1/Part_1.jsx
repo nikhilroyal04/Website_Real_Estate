@@ -26,6 +26,7 @@ import {
 } from "../../../app/Slices/propertiesSlice";
 import { MdArrowOutward } from "react-icons/md";
 import { useNavigate } from "react-router-dom";
+import Fetch201 from "../../Not_Found/Fetch201";
 
 const Part_1 = () => {
   const isSmallScreen = useBreakpointValue({ base: true, md: false });
@@ -43,24 +44,16 @@ const Part_1 = () => {
   useEffect(() => {
     if (searchTerm.trim()) {
       dispatch(
-        fetchAllpropertyData(
-          1,
-          "",
-          searchTerm,
-          propertyType,
-          selectedTab
-        )
+        fetchAllpropertyData(1, "", searchTerm, propertyType, selectedTab)
       );
-    } else {
-      setFilteredProperties([]);
     }
   }, [dispatch, searchTerm, propertyType, selectedTab]);
 
   useEffect(() => {
-    if (searchTerm.trim()) {
+    if (!propertyLoading && !propertyError) {
       setFilteredProperties(propertyData);
     }
-  }, [propertyData, searchTerm]);
+  }, [propertyData, propertyLoading, propertyError]);
 
   const handleSearch = (event) => {
     setSearchTerm(event.target.value);
@@ -75,7 +68,8 @@ const Part_1 = () => {
     setSelectedTab(tabNames[index]);
   };
 
-  const showError = searchTerm && propertyError;
+  const showError = propertyError;
+  const isLoading = propertyLoading;
 
   const topProperties = filteredProperties.slice(0, 4);
 
@@ -92,7 +86,15 @@ const Part_1 = () => {
       propertyType,
     };
     const queryString = createQueryString(filters);
-    navigate(`/property/?${queryString}`);
+
+    // Pass property details as state
+    navigate(`/property/?${queryString}`, {
+      state: {
+        searchTerm,
+        propertyType,
+        selectedTab,
+      },
+    });
   };
 
   return (
@@ -131,7 +133,11 @@ const Part_1 = () => {
           transition="transform 0.3s ease"
         >
           <HStack spacing={4} mb={4} width="100%">
-            <Tabs variant="enclosed" colorScheme="teal" onChange={handleTabChange}>
+            <Tabs
+              variant="enclosed"
+              colorScheme="teal"
+              onChange={handleTabChange}
+            >
               <TabList>
                 <Tab fontWeight="bold">Buy</Tab>
                 <Tab fontWeight="bold">Rent</Tab>
@@ -174,7 +180,18 @@ const Part_1 = () => {
               Search
             </Button>
           </Flex>
-          {showError && (
+          {isLoading && (
+            <Flex
+              direction="column"
+              justify="center"
+              alignItems="center"
+              mt={4}
+              width="100%"
+            >
+              <Fetch201 />
+            </Flex>
+          )}
+          {showError && !isLoading && (
             <Text mt={4} color="red.500" fontWeight="bold">
               Unable to fetch data. Please try again later.
             </Text>
@@ -191,49 +208,9 @@ const Part_1 = () => {
           alignItems="center"
           width={900}
         >
-          {filteredProperties.length > 0 ? (
-            <VStack spacing={4} mt={6} align="center" w="100%" maxH="55vh">
-              {topProperties.map((property) => (
-                <Box
-                  key={property._id}
-                  borderWidth="1px"
-                  borderRadius="xl"
-                  p={3}
-                  bg="rgba(255, 255, 255, 0.5)"
-                  shadow="md"
-                  width="90%"
-                  display="flex"
-                  alignItems="center"
-                  onClick={() => handlePropertyClick(property)}
-                  _hover={{
-                    transform: "scale(1.02)",
-                    transition: "transform 0.3s ease",
-                    cursor: "pointer",
-                  }}
-                >
-                  <FaMapLocationDot
-                    fontSize="24px"
-                    style={{ marginRight: 20 }}
-                  />
-                  <Flex
-                    width="90%"
-                    justifyContent="space-between"
-                    alignItems="center"
-                  >
-                    <Box>
-                      <Text fontWeight="bold">
-                        {property.propertySubtype} in {property.location}
-                      </Text>
-                      <Text>{property.subLocation}</Text>
-                    </Box>
-                    <Box>
-                      <MdArrowOutward fontSize={25} />
-                    </Box>
-                  </Flex>
-                </Box>
-              ))}
-            </VStack>
-          ) : (
+          {isLoading ? null : searchTerm.trim() === "" ? (
+            <Text fontSize="lg" fontWeight="bold" color="gray.700"></Text>
+          ) : filteredProperties.length === 0 ? (
             <Flex
               direction="column"
               justify="center"
@@ -241,10 +218,58 @@ const Part_1 = () => {
               height="100%"
               width="100%"
             >
-              <Text fontSize="lg" fontWeight="bold" color="gray.700">
+              <Text fontSize="xl" fontWeight="bold" color="red">
                 No properties found
               </Text>
             </Flex>
+          ) : (
+            <VStack spacing={4} mt={6} align="center" w="100%" maxH="55vh">
+              {topProperties.length > 0 ? (
+                topProperties.map((property) => (
+                  <Box
+                    key={property._id}
+                    borderWidth="1px"
+                    borderRadius="xl"
+                    p={3}
+                    bg="rgba(255, 255, 255, 0.5)"
+                    shadow="md"
+                    width="90%"
+                    display="flex"
+                    alignItems="center"
+                    onClick={() => handlePropertyClick(property)}
+                    _hover={{
+                      transform: "scale(1.02)",
+                      transition: "transform 0.3s ease",
+                      cursor: "pointer",
+                    }}
+                  >
+                    <FaMapLocationDot
+                      fontSize="24px"
+                      style={{ marginRight: 20 }}
+                    />
+                    <Flex
+                      width="90%"
+                      justifyContent="space-between"
+                      alignItems="center"
+                    >
+                      <Box>
+                        <Text fontWeight="bold">
+                          {property.propertySubtype} in {property.location}
+                        </Text>
+                        <Text>{property.subLocation}</Text>
+                      </Box>
+                      <Box>
+                        <MdArrowOutward fontSize={25} />
+                      </Box>
+                    </Flex>
+                  </Box>
+                ))
+              ) : (
+                <Text fontSize="lg" fontWeight="bold" color="gray.700">
+                  No properties found
+                </Text>
+              )}
+            </VStack>
           )}
         </Box>
       </Container>

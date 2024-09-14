@@ -1,24 +1,20 @@
-import React, { useState, useEffect } from "react";
-import {
-  Box,
-  Flex,
-  IconButton,
-  Button,
-  useDisclosure,
-  HStack,
-  Text,
-} from "@chakra-ui/react";
+import React, { useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { Box, Flex, IconButton, Button, useDisclosure, HStack, Text } from "@chakra-ui/react";
 import { HamburgerIcon } from "@chakra-ui/icons";
 import { FaMapMarkerAlt } from "react-icons/fa";
 import Sidebar from "../Sidebar/Sidebar";
 import Logo from "../Logo/Logo";
 import { useNavigate } from "react-router-dom";
+import { setLocation, resetLocation, selectLocation, selectLocationStatus, selectLocationError, fetchCityByLatLng } from '../../app/Slices/locationSlice';
 
 const Header = () => {
   const navigate = useNavigate();
   const { isOpen, onOpen, onClose } = useDisclosure();
-
-  const [location, setLocation] = useState("India");
+  const dispatch = useDispatch();
+  const location = useSelector(selectLocation);
+  const status = useSelector(selectLocationStatus);
+  const error = useSelector(selectLocationError);
 
   useEffect(() => {
     const fetchLocation = () => {
@@ -26,22 +22,20 @@ const Header = () => {
         navigator.geolocation.getCurrentPosition(
           (position) => {
             const { latitude, longitude } = position.coords;
-            // Format latitude and longitude for display
-            setLocation(
-              `Lat: ${latitude.toFixed(2)}, Long: ${longitude.toFixed(2)}`
-            );
+            dispatch(setLocation({ latitude, longitude }));
+            fetchCityByLatLng(dispatch, latitude, longitude); 
           },
           () => {
-            setLocation("India"); // Fallback if location fetch fails
+            dispatch(resetLocation());
           }
         );
       } else {
-        setLocation("India"); // Fallback if geolocation is not supported
+        dispatch(resetLocation());
       }
     };
 
     fetchLocation();
-  }, []);
+  }, [dispatch]);
 
   const handleLogin = () => {
     navigate("/login");
@@ -89,7 +83,7 @@ const Header = () => {
           <HStack spacing={2} color="teal.500" ml={4}>
             <FaMapMarkerAlt />
             <Text fontWeight="bold" fontSize="lg">
-              {location}
+              {status === 'loading' ? 'Loading...' : location}
             </Text>
           </HStack>
         </Flex>
@@ -132,8 +126,8 @@ const Header = () => {
           borderTop="1px"
           borderColor="gray.200"
         >
-          <Sidebar onClose={onClose} />
-        </Box>
+          <Sidebar onClose={onClose} city={location} /> 
+          </Box>
       )}
     </Box>
   );

@@ -13,19 +13,17 @@ import { CloseIcon } from "@chakra-ui/icons";
 import { useNavigate } from "react-router-dom";
 import Logo from "../Logo/Logo";
 
-const Sidebar = ({ onClose }) => {
+const Sidebar = ({ onClose, city }) => {
   const navigate = useNavigate();
-
 
   const handleClick = () => {
     navigate("/login");
   };
 
-
   return (
     <Box
-      bg="teal.500"
-      w="250px" // Slightly wider for better spacing
+      bg="blue.200"
+      w="250px" 
       h="100vh"
       pos="fixed"
       top={0}
@@ -34,26 +32,34 @@ const Sidebar = ({ onClose }) => {
       color="white"
       boxShadow="lg"
       p={4}
-      borderRadius="md" // Rounded corners for the sidebar
+      borderRadius="md" 
     >
       <IconButton
         aria-label="Close Menu"
         icon={<CloseIcon />}
         onClick={onClose}
         color="teal.500"
-        bg="white"
+        bg="blue.200"
         position="absolute"
         top={4}
         right={4}
-        borderRadius="full" // Round the close button
+        borderRadius="full"
       />
       <VStack spacing={6} alignItems="center" mt={12}>
         <Logo />
         <VStack spacing={4} alignItems="flex-start" w="full">
-          <HStack spacing={3} alignItems="center">
-            <FaMapMarkerAlt />
-            <Text fontWeight="bold" fontSize="lg">
-              Location
+          <HStack
+            spacing={3}
+            alignItems="center"
+            justifyContent="center"
+            mx="auto"
+            mb={5}
+          >
+            {" "}
+            <FaMapMarkerAlt fontSize={25} />
+            <Text fontWeight="bold" fontSize="2xl" textAlign="center">
+              {" "}
+              {city}
             </Text>
           </HStack>
           <Button
@@ -61,7 +67,7 @@ const Sidebar = ({ onClose }) => {
             colorScheme="teal"
             borderRadius="md"
             w="full"
-            _hover={{ transform: "scale(0.95)", bg: "teal.600" }} // Zoom out effect on hover
+            _hover={{ transform: "scale(0.95)", bg: "teal.600" }}
             transition="transform 0.2s"
           >
             Sell Property
@@ -71,7 +77,7 @@ const Sidebar = ({ onClose }) => {
             colorScheme="teal"
             borderRadius="md"
             w="full"
-            _hover={{ transform: "scale(0.95)", bg: "teal.600" }} // Zoom out effect on hover
+            _hover={{ transform: "scale(0.95)", bg: "teal.600" }} 
             transition="transform 0.2s"
           >
             Rent Property
@@ -81,7 +87,7 @@ const Sidebar = ({ onClose }) => {
             colorScheme="teal"
             borderRadius="md"
             w="full"
-            _hover={{ transform: "scale(0.95)", bg: "teal.600" }} // Zoom out effect on hover
+            _hover={{ transform: "scale(0.95)", bg: "teal.600" }} 
             transition="transform 0.2s"
             onClick={handleClick}
           >
@@ -92,7 +98,7 @@ const Sidebar = ({ onClose }) => {
             colorScheme="teal"
             borderRadius="md"
             w="full"
-            _hover={{ transform: "scale(0.95)", bg: "teal.600" }} 
+            _hover={{ transform: "scale(0.95)", bg: "teal.600" }}
             transition="transform 0.2s"
           >
             Contact Us

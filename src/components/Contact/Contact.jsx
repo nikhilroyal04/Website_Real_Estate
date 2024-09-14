@@ -87,7 +87,6 @@ const Contact = () => {
         }, 2000);
       } catch (error) {
         console.error("Failed to submit form data:", error);
-        // Optionally, display an error message to the user
       }
     }
   };

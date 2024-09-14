@@ -154,7 +154,7 @@ const PropertyDetails = () => {
                     alt={`Property ${property._id} image ${index + 1}`}
                     style={{
                       width: "100%",
-                      height: "70vh",
+                      height: "auto",
                       objectFit: "cover",
                     }}
                   />

@@ -1,27 +1,20 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import {
   Box,
   Input,
   Grid,
   Button,
   useBreakpointValue,
-  Menu,
-  MenuButton,
-  MenuList,
-  MenuItem,
   Stack,
   useDisclosure,
-  Divider,
+  Menu,
+  MenuList,
 } from "@chakra-ui/react";
 import Select from "react-select";
-import { useDispatch } from "react-redux";
-import { fetchAllpropertyData } from "../../../app/Slices/propertiesSlice";
-import { RxCross2 } from "react-icons/rx";
-import { useSearchParams } from "react-router-dom"; 
 import { CiFilter } from "react-icons/ci";
+import { RxCross2 } from "react-icons/rx";
 
-export default function Part_2() {
-  // Custom styles for react-select
+const Filter_Options = ({ filters, setFilters }) => {
   const customStyles = {
     control: (base) => ({
       ...base,
@@ -38,7 +31,7 @@ export default function Part_2() {
       borderRadius: "15px",
       overflow: "hidden",
       boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
-      zIndex: 2000, 
+      zIndex: 2000,
     }),
     option: (provided, state) => ({
       ...provided,
@@ -51,99 +44,26 @@ export default function Part_2() {
     }),
   };
 
-  const dispatch = useDispatch();
   const { isOpen, onOpen, onClose } = useDisclosure();
-  const [searchParams, setSearchParams] = useSearchParams();
 
-  // Filter state
-  const [location, setLocation] = useState(searchParams.get("location") || "");
-  const [subLocation, setSubLocation] = useState(searchParams.get("subLocation") || "");
-  const [propertyFor, setPropertyFor] = useState(searchParams.get("propertyFor") || "");
-  const [propertyType, setPropertyType] = useState(searchParams.get("propertyType") || "");
-  const [propertySubtype, setPropertySubtype] = useState(searchParams.get("propertySubtype") || "");
-
-  // Fetch data when any filter changes
-  useEffect(() => {
-    const currentFilters = {
-      location,
-      subLocation,
-      propertyFor,
-      propertyType,
-      propertySubtype,
-    };
-    // Update URL parameters
-    setSearchParams(currentFilters);
-
-    dispatch(
-      fetchAllpropertyData(
-        1,
-        "",
-        location,
-        subLocation,
-        propertyFor,
-        propertyType,
-        propertySubtype
-      )
-    );
-  }, [dispatch, location, subLocation, propertyFor, propertyType, propertySubtype, setSearchParams]);
+  const isSmallScreen = useBreakpointValue({ base: true, md: false });
 
   const handleFilterChange = (filterName, value) => {
-    switch (filterName) {
-      case "location":
-        setLocation(value);
-        break;
-      case "subLocation":
-        setSubLocation(value);
-        break;
-      case "propertyFor":
-        setPropertyFor(value);
-        break;
-      case "propertyType":
-        setPropertyType(value);
-        break;
-      case "propertySubtype":
-        setPropertySubtype(value);
-        break;
-      default:
-        break;
-    }
+    setFilters(filterName, value);
   };
 
   const handleResetFilters = () => {
-    setLocation("");
-    setSubLocation("");
-    setPropertyFor("");
-    setPropertyType("");
-    setPropertySubtype("");
-    setSearchParams({});
+    for (const key of Object.keys(filters)) {
+      handleFilterChange(key, "");
+    }
   };
 
   const handleApplyFilters = () => {
     onClose();
-    dispatch(
-      fetchAllpropertyData(
-        1,
-        "",
-        location,
-        subLocation,
-        propertyFor,
-        propertyType,
-        propertySubtype
-      )
-    );
   };
 
-  const isSmallScreen = useBreakpointValue({ base: true, md: false });
-
   return (
-    <Box
-      p={5}
-      // bg="gray.50"
-      borderRadius="md"
-      maxWidth="100vw"
-      mx="auto"
-      position="relative"
-    >
+    <Box p={5} borderRadius="md" maxWidth="100vw" mx="auto" position="relative">
       {isSmallScreen ? (
         <>
           <Stack spacing={2} direction="row" align="center" mb={4}>
@@ -153,7 +73,7 @@ export default function Part_2() {
               bg="white"
               boxShadow="sm"
               _hover={{ boxShadow: "md" }}
-              value={location}
+              value={filters.location}
               onChange={(e) => handleFilterChange("location", e.target.value)}
             />
             <Button
@@ -184,7 +104,7 @@ export default function Part_2() {
                   <Button onClick={onClose} variant="ghost">
                     <RxCross2 fontSize={25} />
                   </Button>
-                </Box>{" "}
+                </Box>
                 <Stack spacing={4} p={4}>
                   <Input
                     placeholder="Enter Location"
@@ -192,10 +112,8 @@ export default function Part_2() {
                     bg="white"
                     boxShadow="sm"
                     _hover={{ boxShadow: "md" }}
-                    value={location}
-                    onChange={(e) =>
-                      handleFilterChange("location", e.target.value)
-                    }
+                    value={filters.location}
+                    onChange={(e) => handleFilterChange("location", e.target.value)}
                   />
                   <Input
                     placeholder="Enter Sub-location"
@@ -203,10 +121,8 @@ export default function Part_2() {
                     bg="white"
                     boxShadow="sm"
                     _hover={{ boxShadow: "md" }}
-                    value={subLocation}
-                    onChange={(e) =>
-                      handleFilterChange("subLocation", e.target.value)
-                    }
+                    value={filters.subLocation}
+                    onChange={(e) => handleFilterChange("subLocation", e.target.value)}
                   />
                   <Select
                     placeholder="Property For"
@@ -218,15 +134,12 @@ export default function Part_2() {
                     ]}
                     styles={customStyles}
                     value={
-                      propertyFor
-                        ? { value: propertyFor, label: propertyFor }
+                      filters.propertyFor
+                        ? { value: filters.propertyFor, label: filters.propertyFor }
                         : null
                     }
                     onChange={(option) =>
-                      handleFilterChange(
-                        "propertyFor",
-                        option ? option.value : ""
-                      )
+                      handleFilterChange("propertyFor", option ? option.value : "")
                     }
                   />
                   <Select
@@ -238,25 +151,19 @@ export default function Part_2() {
                     ]}
                     styles={customStyles}
                     value={
-                      propertyType
-                        ? { value: propertyType, label: propertyType }
+                      filters.propertyType
+                        ? { value: filters.propertyType, label: filters.propertyType }
                         : null
                     }
                     onChange={(option) =>
-                      handleFilterChange(
-                        "propertyType",
-                        option ? option.value : ""
-                      )
+                      handleFilterChange("propertyType", option ? option.value : "")
                     }
                   />
                   <Select
                     placeholder="Property Subtype"
                     options={[
                       { value: "Mall", label: "Mall" },
-                      {
-                        value: "High Street Market",
-                        label: "High Street Market",
-                      },
+                      { value: "High Street Market", label: "High Street Market" },
                       { value: "Shop", label: "Shop" },
                       { value: "Farm House", label: "Farm House" },
                       { value: "Flat", label: "Flat" },
@@ -264,15 +171,12 @@ export default function Part_2() {
                     ]}
                     styles={customStyles}
                     value={
-                      propertySubtype
-                        ? { value: propertySubtype, label: propertySubtype }
+                      filters.propertySubtype
+                        ? { value: filters.propertySubtype, label: filters.propertySubtype }
                         : null
                     }
                     onChange={(option) =>
-                      handleFilterChange(
-                        "propertySubtype",
-                        option ? option.value : ""
-                      )
+                      handleFilterChange("propertySubtype", option ? option.value : "")
                     }
                   />
                   <Stack direction="row" spacing={4}>
@@ -301,29 +205,24 @@ export default function Part_2() {
           maxW="90vw"
           mx="auto"
         >
-          {/* Location Input */}
           <Input
             placeholder="Enter Location"
             borderRadius="full"
             bg="white"
             boxShadow="sm"
             _hover={{ boxShadow: "md" }}
-            value={location}
+            value={filters.location}
             onChange={(e) => handleFilterChange("location", e.target.value)}
           />
-
-          {/* Sub-location Input */}
           <Input
             placeholder="Enter Sub-location"
             borderRadius="full"
             bg="white"
             boxShadow="sm"
             _hover={{ boxShadow: "md" }}
-            value={subLocation}
+            value={filters.subLocation}
             onChange={(e) => handleFilterChange("subLocation", e.target.value)}
           />
-
-          {/* Property For Select with react-select */}
           <Select
             placeholder="Property For"
             options={[
@@ -334,14 +233,14 @@ export default function Part_2() {
             ]}
             styles={customStyles}
             value={
-              propertyFor ? { value: propertyFor, label: propertyFor } : null
+              filters.propertyFor
+                ? { value: filters.propertyFor, label: filters.propertyFor }
+                : null
             }
             onChange={(option) =>
               handleFilterChange("propertyFor", option ? option.value : "")
             }
           />
-
-          {/* Property Type Select with react-select */}
           <Select
             placeholder="Property Type"
             options={[
@@ -351,14 +250,14 @@ export default function Part_2() {
             ]}
             styles={customStyles}
             value={
-              propertyType ? { value: propertyType, label: propertyType } : null
+              filters.propertyType
+                ? { value: filters.propertyType, label: filters.propertyType }
+                : null
             }
             onChange={(option) =>
               handleFilterChange("propertyType", option ? option.value : "")
             }
           />
-
-          {/* Property Subtype Select with react-select */}
           <Select
             placeholder="Property Subtype"
             options={[
@@ -371,8 +270,8 @@ export default function Part_2() {
             ]}
             styles={customStyles}
             value={
-              propertySubtype
-                ? { value: propertySubtype, label: propertySubtype }
+              filters.propertySubtype
+                ? { value: filters.propertySubtype, label: filters.propertySubtype }
                 : null
             }
             onChange={(option) =>
@@ -392,7 +291,9 @@ export default function Part_2() {
           )}
         </Grid>
       )}
-      <Box height="3px" bg="gray.300" my={4} />{" "}
+      <Box height="3px" bg="gray.300" my={4} />
     </Box>
   );
-}
+};
+
+export default Filter_Options;

@@ -77,8 +77,8 @@ const Part_4 = () => {
               position="relative"
               overflow="hidden"
               borderRadius="lg"
-              transform={index % 2 === 0 ? "rotate(-3deg)" : "rotate(3deg)"} // Shifted angles for effect
-              _hover={{ transform: "scale(1.05) rotate(0deg)" }} // Hover effect with scale and reset angle
+              transform={index % 2 === 0 ? "rotate(-3deg)" : "rotate(3deg)"} 
+              _hover={{ transform: "scale(1.05) rotate(0deg)" }} 
               transition="all 0.3s ease"
             >
               <Image

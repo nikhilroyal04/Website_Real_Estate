@@ -9,7 +9,7 @@ import {
   Link,
   useBreakpointValue,
 } from "@chakra-ui/react";
-import { FaFacebookF, FaTwitter, FaLinkedinIn } from "react-icons/fa"; // Import icons
+import { FaFacebookF, FaTwitter, FaLinkedinIn } from "react-icons/fa"; 
 import Logo from "../Logo/Logo";
 
 const Footer = () => {
@@ -42,7 +42,7 @@ const Footer = () => {
             </Text>
           </VStack>
 
-          <VStack align="start" spacing={4} ml={8}>
+          <VStack align="start" spacing={4}>
             <Text fontSize="lg" fontWeight="bold">
               About
             </Text>

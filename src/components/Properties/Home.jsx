@@ -26,6 +26,8 @@ export default function Home() {
     propertySubtype: searchParams.get("propertySubtype") || "",
   });
 
+  const [currentPage, setCurrentPage] = useState(1);
+
   const dispatch = useDispatch();
   const propertyData = useSelector(selectpropertyData);
   const propertyError = useSelector(selectpropertyError);
@@ -33,10 +35,10 @@ export default function Home() {
   const totalPages = useSelector(selectTotalPages);
 
   useEffect(() => {
-    // Fetch data for page 1 with current filters
+    // Fetch data with current filters and page
     dispatch(
       fetchAllpropertyData(
-        1,
+        currentPage,
         "",
         filters.location,
         filters.subLocation,
@@ -45,24 +47,34 @@ export default function Home() {
         filters.propertySubtype
       )
     );
-  }, [dispatch, filters]);
+  }, [dispatch, filters, currentPage]); 
 
   useEffect(() => {
-    // Update URL parameters when filters change
+    // Update URL parameters when filters or page change
     const params = new URLSearchParams();
     for (const [key, value] of Object.entries(filters)) {
       if (value) {
         params.set(key, value);
       }
     }
+    params.set("page", currentPage);
     setSearchParams(params);
-  }, [filters, setSearchParams]);
+  }, [filters, currentPage, setSearchParams]);
+
+  // Function to handle page changes
+  const handlePageChange = (newPage) => {
+    setCurrentPage(newPage);
+    
+    window.scrollTo({ top: 0, behavior: "smooth" });
+
+  };
 
   const handleFilterChange = (filterName, value) => {
     setFilters((prevFilters) => ({
       ...prevFilters,
       [filterName]: value,
     }));
+    setCurrentPage(1); 
   };
 
   return (
@@ -78,8 +90,8 @@ export default function Home() {
         <View
           propertyData={propertyData}
           totalPages={totalPages}
-          currentPage={1}
-          onPageChange={() => {}}
+          currentPage={currentPage}
+          onPageChange={handlePageChange} 
         />
       )}
     </div>

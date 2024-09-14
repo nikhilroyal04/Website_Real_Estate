@@ -60,7 +60,7 @@ const Header = () => {
           aria-label="Open Menu"
           display={{ base: "flex", md: "none" }}
           onClick={onOpen}
-          colorScheme="teal"
+          bg="white"
           borderRadius="full"
         />
 

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Box, Button, Container, FormControl, FormLabel, Input, Stack, Heading, Text } from '@chakra-ui/react';
 import { useNavigate } from 'react-router-dom';
@@ -24,6 +24,12 @@ const LoginPage = () => {
     event.preventDefault();
     dispatch(loginUser(email, password));
   };
+
+  useEffect(() => {
+    if (user) {
+      navigate('/');
+    }
+  }, [user, navigate]);
 
   const handleClick = () => {
     navigate('/signup');

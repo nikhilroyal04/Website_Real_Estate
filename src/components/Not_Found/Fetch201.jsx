@@ -17,7 +17,7 @@ const Fetch201 = () => {
         loop
         animationData={loaderAnimation}
         play
-        style={{ width: 100, height: 100 }}
+        style={{ width: 150, height: 150 }}
       />
     </div>
   );

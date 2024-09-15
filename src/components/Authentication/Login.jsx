@@ -1,7 +1,9 @@
-import React from "react";
-import { Box, Button, Container, FormControl, FormLabel, Input, Stack, Heading, Text } from "@chakra-ui/react";
-import { useNavigate } from "react-router-dom";
-import { motion } from "framer-motion";
+import React, { useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { Box, Button, Container, FormControl, FormLabel, Input, Stack, Heading, Text } from '@chakra-ui/react';
+import { useNavigate } from 'react-router-dom';
+import { motion } from 'framer-motion';
+import { loginUser } from '../../app/Slices/authSlice';
 
 const pageTransition = {
   initial: { opacity: 0, x: -200 },
@@ -11,15 +13,20 @@ const pageTransition = {
 };
 
 const LoginPage = () => {
+  const dispatch = useDispatch();
   const navigate = useNavigate();
+  const { user, isLoading, error } = useSelector((state) => state.auth);
+
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
 
   const handleSubmit = (event) => {
     event.preventDefault();
-    // Handle form submission here
+    dispatch(loginUser(email, password));
   };
 
   const handleClick = () => {
-    navigate("/signup");
+    navigate('/signup');
   };
 
   return (
@@ -29,7 +36,7 @@ const LoginPage = () => {
       exit="exit"
       transition={pageTransition.transition}
       variants={pageTransition}
-      style={{ width: "100%" }}
+      style={{ width: '100%' }}
     >
       <Container
         maxW="100vw"
@@ -37,13 +44,12 @@ const LoginPage = () => {
         p={0}
         margin={0}
         display="flex"
-        flexDirection={{ base: "column", lg: "row" }}
+        flexDirection={{ base: 'column', lg: 'row' }}
       >
-        {/* Teal Background Section */}
         <Box
-          flexBasis={{ base: "0%", lg: "50%" }}
+          flexBasis={{ base: '0%', lg: '50%' }}
           bg="teal.500"
-          display={{ base: "none", lg: "flex" }}
+          display={{ base: 'none', lg: 'flex' }}
           alignItems="center"
           justifyContent="center"
           color="white"
@@ -58,14 +64,13 @@ const LoginPage = () => {
           </Stack>
         </Box>
 
-        {/* Login Box Section */}
         <Box
           p={6}
           maxW="md"
           borderWidth={1}
           borderRadius="3xl"
           bg="white"
-          width={{ base: "90%", lg: "550px" }}
+          width={{ base: '90%', lg: '550px' }}
           boxShadow="lg"
           display="flex"
           flexDirection="column"
@@ -73,8 +78,8 @@ const LoginPage = () => {
           alignItems="center"
           height="md"
           my="auto"
-          ml={{ base: "auto", lg: "25vh" }}
-          mr={{ base: "auto", lg: "0" }}
+          ml={{ base: 'auto', lg: '25vh' }}
+          mr={{ base: 'auto', lg: '0' }}
         >
           <Heading mb={4} textAlign="center" fontSize="3xl" color="teal.600">
             Login
@@ -89,7 +94,9 @@ const LoginPage = () => {
                   bg="gray.50"
                   borderRadius="lg"
                   boxShadow="sm"
-                  width={{ base: "100%", lg: 350 }}
+                  width={{ base: '100%', lg: 350 }}
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
                 />
               </FormControl>
               <FormControl id="password" isRequired>
@@ -100,7 +107,9 @@ const LoginPage = () => {
                   bg="gray.50"
                   borderRadius="lg"
                   boxShadow="sm"
-                  width={{ base: "100%", lg: 350 }}
+                  width={{ base: '100%', lg: 350 }}
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
                 />
               </FormControl>
               <Button
@@ -110,7 +119,8 @@ const LoginPage = () => {
                 width="full"
                 borderRadius="md"
                 boxShadow="md"
-                sx={{ width: 250, mx: "auto" }}
+                sx={{ width: 250, mx: 'auto' }}
+                isLoading={isLoading}
               >
                 Login
               </Button>
@@ -122,11 +132,16 @@ const LoginPage = () => {
             </Button>
           </Text>
           <Text mt={4} textAlign="center">
-            Don't have an account?{" "}
+            Don't have an account?{' '}
             <Button variant="link" onClick={handleClick} colorScheme="teal">
               Sign Up
             </Button>
           </Text>
+          {error && (
+            <Text mt={4} color="red.500" textAlign="center">
+              {error.message || 'Login failed'}
+            </Text>
+          )}
         </Box>
       </Container>
     </motion.div>

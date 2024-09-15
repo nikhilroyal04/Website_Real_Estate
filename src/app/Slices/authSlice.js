@@ -38,7 +38,7 @@ const authSlice = createSlice({
       state.token = null;
       state.isLoading = false;
       state.error = null;
-      Cookies.remove('authToken'); 
+      Cookies.remove('authToken'); // Remove token from cookies
     },
     setUser: (state, action) => {
       console.log('User details fetched:', action.payload);
@@ -58,10 +58,7 @@ export const loginUser = (email, password) => async (dispatch) => {
     const response = await axios.post(
       `${import.meta.env.VITE_BASE_URL}auth/login`,
       { email, password },
-      {
-        headers: { "Content-Type": "application/json" },
-        withCredentials: true, // Ensure cookies are sent with the request
-      }
+      { headers: { "Content-Type": "application/json" } }
     );
 
     const { token } = response.data.data;
@@ -69,26 +66,15 @@ export const loginUser = (email, password) => async (dispatch) => {
     console.log('Token received:', token);
 
     // Store token in cookies
-    Cookies.set('authToken', token, { expires: 7, path: '/' }); 
+    Cookies.set('authToken', token, { expires: 10 }); 
 
-    // Set token and user in state
+    // Set user and token in state
     dispatch(loginSuccess({ user: null, token }));
 
-    // Optionally, trigger fetching user details after login
-    dispatch(fetchUserDetails(token));
-
-  } catch (error) {
-    console.error('Error during login:', error);
-    dispatch(loginFailure(error.response?.data?.errorMessage || error.message));
-  }
-};
-
-// Separate thunk for fetching user details
-export const fetchUserDetails = (token) => async (dispatch) => {
-  try {
+    // Log headers before making the request
     const headers = {
       Authorization: `Bearer ${token}`,
-      'Content-Type': 'application/json',
+      'Content-Type': 'application/json'
     };
     console.log('Headers for profile request:', headers);
 
@@ -98,11 +84,9 @@ export const fetchUserDetails = (token) => async (dispatch) => {
       { headers }
     );
     console.log('User details response:', userDetailsResponse.data);
-
-    // Dispatch action to set user details in state
     dispatch(setUser(userDetailsResponse.data.user));
   } catch (error) {
-    console.error('Error fetching user details:', error);
+    console.error('Error during login or fetching user details:', error);
     dispatch(loginFailure(error.response?.data?.errorMessage || error.message));
   }
 };

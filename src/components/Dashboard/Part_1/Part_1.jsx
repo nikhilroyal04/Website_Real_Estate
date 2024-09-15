@@ -180,6 +180,18 @@ const Part_1 = () => {
               Search
             </Button>
           </Flex>
+        </Box>
+
+        <Box
+          borderRadius="lg"
+          boxShadow="md"
+          p={2}
+          maxW={isSmallScreen ? "90%" : "100%"}
+          display="flex"
+          flexDirection="column"
+          alignItems="center"
+          width={900}
+        >
           {isLoading && (
             <Flex
               direction="column"
@@ -196,18 +208,6 @@ const Part_1 = () => {
               Unable to fetch data. Please try again later.
             </Text>
           )}
-        </Box>
-
-        <Box
-          borderRadius="lg"
-          boxShadow="md"
-          p={2}
-          maxW={isSmallScreen ? "90%" : "100%"}
-          display="flex"
-          flexDirection="column"
-          alignItems="center"
-          width={900}
-        >
           {isLoading ? null : searchTerm.trim() === "" ? (
             <Text fontSize="lg" fontWeight="bold" color="gray.700"></Text>
           ) : filteredProperties.length === 0 ? (

@@ -18,7 +18,7 @@ const NoData = () => {
         loop
         animationData={loaderAnimation}
         play
-        style={{ width: 500, height: 500 }}
+        style={{ width: 500, height: 500, }}
       />
     </div>
   );

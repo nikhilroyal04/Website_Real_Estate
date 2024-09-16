@@ -145,8 +145,8 @@ const LoginPage = () => {
           </Text>
           {error && (
             <Text mt={4} color="red.500" textAlign="center">
-              {error.message || 'Login failed'}
-            </Text>
+              {typeof error === 'string' ? error : error.message || 'Something went wrong'}
+              </Text>
           )}
         </Box>
       </Container>

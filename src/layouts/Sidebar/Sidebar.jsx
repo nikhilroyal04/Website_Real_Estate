@@ -16,14 +16,18 @@ import Logo from "../Logo/Logo";
 const Sidebar = ({ onClose, city }) => {
   const navigate = useNavigate();
 
-  const handleClick = () => {
+  const handleLogin = () => {
     navigate("/login");
+  };
+
+  const handleLogout = () => {
+    navigate("/logout");
   };
 
   return (
     <Box
       bg="blue.200"
-      w="250px" 
+      w="250px"
       h="100vh"
       pos="fixed"
       top={0}
@@ -32,7 +36,7 @@ const Sidebar = ({ onClose, city }) => {
       color="white"
       boxShadow="lg"
       p={4}
-      borderRadius="md" 
+      borderRadius="md"
     >
       <IconButton
         aria-label="Close Menu"
@@ -64,44 +68,51 @@ const Sidebar = ({ onClose, city }) => {
           </HStack>
           <Button
             variant="solid"
-            colorScheme="teal"
             borderRadius="md"
             w="full"
-            _hover={{ transform: "scale(0.95)", bg: "teal.600" }}
+            _hover={{ transform: "scale(0.95)", bg: "blue.200" }}
             transition="transform 0.2s"
           >
             Sell Property
           </Button>
           <Button
             variant="solid"
-            colorScheme="teal"
             borderRadius="md"
             w="full"
-            _hover={{ transform: "scale(0.95)", bg: "teal.600" }} 
+            _hover={{ transform: "scale(0.95)", bg: "blue.200" }}
             transition="transform 0.2s"
           >
             Rent Property
           </Button>
           <Button
             variant="solid"
-            colorScheme="teal"
             borderRadius="md"
             w="full"
-            _hover={{ transform: "scale(0.95)", bg: "teal.600" }} 
+            _hover={{ transform: "scale(0.95)", bg: "blue.200" }}
             transition="transform 0.2s"
-            onClick={handleClick}
+            onClick={handleLogin}
           >
             Login / Sign Up
           </Button>
           <Button
             variant="solid"
-            colorScheme="teal"
             borderRadius="md"
             w="full"
-            _hover={{ transform: "scale(0.95)", bg: "teal.600" }}
+            _hover={{ transform: "scale(0.95)", bg: "blue.200" }}
             transition="transform 0.2s"
           >
             Contact Us
+          </Button>
+          <Button
+            variant="solid"
+            borderRadius="md"
+            bg="blue.300"
+            w="full"
+            _hover={{ transform: "scale(0.95)", bg: "blue.400" }}
+            transition="transform 0.2s"
+            onClick={handleLogout}
+          >
+            Logout
           </Button>
         </VStack>
       </VStack>

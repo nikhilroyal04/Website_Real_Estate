@@ -1,6 +1,6 @@
 import { createSlice } from "@reduxjs/toolkit";
 import axios from "axios";
-import Cookies from "js-cookie"; // Use js-cookie to handle cookies
+import Cookies from "js-cookie"; 
 
 // Initial state for the authentication slice
 const initialState = {
@@ -59,9 +59,6 @@ export const loginUser = (email, password) => async (dispatch) => {
 
     const { token } = response.data.data;
 
-    // Set user and token in state
-    dispatch(loginSuccess({ user: null, token }));
-
     // Log headers before making the request
     const headers = {
       Authorization: `Bearer ${token}`,
@@ -73,7 +70,18 @@ export const loginUser = (email, password) => async (dispatch) => {
       `${import.meta.env.VITE_BASE_URL}get/profile`,
       { headers, withCredentials: true }
     );
-    dispatch(setUser(userDetailsResponse.data.data));
+
+    const user = userDetailsResponse.data.data;
+
+    // Check if the user's status is "Active"
+    if (user.status !== "Active") {
+      // If the user is not active, reject login
+      throw new Error("Your account is not active.");
+    }
+
+    // Set user and token in state if status is "Active"
+    dispatch(loginSuccess({ user, token }));
+
     return response;
 
   } catch (error) {
@@ -88,6 +96,7 @@ export const loginUser = (email, password) => async (dispatch) => {
     );
   }
 };
+
 
 // Selectors
 export const selectUser = (state) => state.auth.user;

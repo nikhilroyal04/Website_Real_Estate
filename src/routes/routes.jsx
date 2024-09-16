@@ -9,6 +9,7 @@ import { AnimatePresence } from "framer-motion";
 import Not_Found from "../components/Not_Found/Not_Found";
 import Home from "../components/Properties/Home";
 import Property from "../components/Detail_Property/Property";
+import Logout from "../components/Authentication/Logout";
 
 const Routing = () => {
   return (
@@ -16,6 +17,7 @@ const Routing = () => {
       <Routes>
         {/* Authentication Routes */}
         <Route path="/login" element={<Login />} />
+        <Route path="/logout" element={<Logout />} />
         <Route path="/signup" element={<SignUp />} />
 
         {/* Main Layout Routes */}
